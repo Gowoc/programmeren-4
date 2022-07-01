@@ -1,0 +1,23 @@
+{
+  "name": "program4",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gowoc/programmeren-4.git"
+  },
+  "author": "Gideon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gowoc/programmeren-4/issues"
+  },
+  "homepage": "https://github.com/Gowoc/programmeren-4#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {},
+  "description": ""
+}
