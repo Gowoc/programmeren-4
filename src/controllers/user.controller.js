@@ -1,3 +1,4 @@
+const pool = require("../database/dbconnection")
 const users = [
 {
     "id": 0,
@@ -65,8 +66,24 @@ function findByID(id) {
 
 let controller = {
     allUsers(req,res) {
-        console.log("alsjeblieft");
-        res.status(200).json({users});
+        //console.log("alsjeblieft");
+        //res.status(200).json({users});
+
+        pool.getConnection(function(err,connection) {
+            if (err) throw err
+        
+            connection.query('SELECT * FROM user;', (error, results, fields) => {
+                connection.release();
+                if (error) throw error;
+                console.log('The solution is: ', results);
+
+                res.status(200).json({
+                    statusCode: 200,
+                    results: results
+                });
+              });
+        });
+
     },
 
     newUser(req,res) {

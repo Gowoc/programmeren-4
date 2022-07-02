@@ -2,6 +2,7 @@ const express = require('express')
 const userRoutes = require("./src/routes/user.routes")
 const app = express()
 const bodyParser = require('body-parser');
+require("dotenv").config();
 
 app.use(bodyParser.json());
 
@@ -13,7 +14,7 @@ app.use(function (req, res, next) {
 	next();
 });
 
-const port = process.env.port || 3000;
+const port = process.env.PORT;
 
 app.all('*', (req,res,next) => {
     const method = req.method;
