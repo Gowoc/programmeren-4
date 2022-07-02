@@ -1,7 +1,9 @@
 const express = require('express')
 const userRoutes = require("./src/routes/user.routes")
 const app = express()
-app.use(express.json());
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
 	res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11,11 +13,17 @@ app.use(function (req, res, next) {
 	next();
 });
 
-const port = 3000
+const port = process.env.port || 3000;
+
+app.all('*', (req,res,next) => {
+    const method = req.method;
+    console.log(`Method ${method} called`);
+    next();
+})
 
 app.use("/api/users", userRoutes);
 
-app.all("*", function (req,res) {
+app.all("*", (req,res) => {
     res.status(404).json({
         error: "Endpoint does not exist",
     });

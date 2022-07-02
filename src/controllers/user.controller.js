@@ -23,15 +23,6 @@ const users = [
 }
 ];
 
-function ValidateEmail(inputText) {
-    console.log(inputText);
-    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if(inputText.value.match(mailformat)) {
-        return false;
-    }
-    else {return true;}
-}
-
 function checkExistingUser(inputEmail) {
     users.forEach(item => {
         if (item.emailAdress == inputEmail) {
@@ -46,9 +37,26 @@ function checkExistingUser(inputEmail) {
     });
 }
 
+function getLatestId() {
+    let returnId;
+    users.forEach(item => {
+        returnId = item.id;
+    })
+    return returnId;
+}
+
+function getAllEmails() {
+    let emails = [];
+    users.forEach(item => {
+        emails.push(item.emailAdress);
+    })
+    return emails;
+}
+
 function findByID(id) {
     users.forEach(item => {
         if (item.id == id) {
+            console.log(item)
             return item;
         } else {return false;}
     });
@@ -74,13 +82,15 @@ let controller = {
         } else if (!newUser.emailAdress.includes("@")) {
             console.log("Emailadres is fout");
             res.status(400).json({message: "Email Adress is fout"});
-        } else if (checkExistingUser(newUser.emailAdress)) {
+        } else if (getAllEmails().includes(newUser.emailAdress)) {
             console.log("Emailadres bestaat al if");
             res.status(409).json({message: "Gebruiker bestaat al"});
         } else {
             console.log("Ik voeg een user toe");
+            let id = getLatestId();
+            id++;
             let addedNewUser = {
-                "id": 5,
+                "id": id,
                 "firstName": newUser.firstName,
                 "lastName": newUser.lastName,
                 "street": newUser.street,
@@ -92,6 +102,18 @@ let controller = {
             }
             users.push(addedNewUser);
             res.status(201).json(addedNewUser);
+        }
+    },
+
+    userByID(req,res) {
+        const userId = req.params.userId;
+        console.log(userId);
+        let user = users.filter((item) => item.id == userId);
+        if (user.length > 0) {
+            console.log(user);
+            res.status(200).json(user);
+        } else {
+            res.status(404).json({message: `User with ID ${userId} not found`});
         }
     }
 };
