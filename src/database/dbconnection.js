@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 require("dotenv").config();
 
 const pool = mysql.createPool({
@@ -10,8 +10,6 @@ const pool = mysql.createPool({
     database: process.env.DB_DATABASE
 });
 
-module.exports = pool;
-
 pool.on('acquire', (connection) => {
     console.log('connection %d acquired', connection.threadId)
 })
@@ -19,3 +17,5 @@ pool.on('acquire', (connection) => {
 pool.on('release', (connection) => {
     console.log('Connection %d released', connection.threadId)
 })
+
+module.exports = pool;

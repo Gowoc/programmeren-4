@@ -1,5 +1,6 @@
 const express = require('express')
 const userRoutes = require("./src/routes/user.routes")
+const mealRoutes = require("./src/routes/meal.routes")
 const app = express()
 const bodyParser = require('body-parser');
 require("dotenv").config();
@@ -22,7 +23,8 @@ app.all('*', (req,res,next) => {
     next();
 })
 
-app.use("/api/users", userRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/meal", mealRoutes);
 
 app.all("*", (req,res) => {
     res.status(404).json({
