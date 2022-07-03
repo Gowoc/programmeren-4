@@ -39,7 +39,7 @@ let controller = {
 
     newMeal(req,res) {
         let newMeal = req.body;
-        let tempCookId = 1;
+        let CookId = req.userIdFromToken;
         arrayForEach(newMeal.allergenes, (callback) => {
 
         if (newMeal.dateTime == null || newMeal.price == null || newMeal.imageUrl == null || newMeal.name == null || newMeal.description == null) {
@@ -52,7 +52,7 @@ let controller = {
                 if (connection) {
                     connection.query(
                         'INSERT INTO `meal` (`name`,`description`,`isActive`,`isVega`,`isVegan`,`isToTakeHome`,`dateTime`,`imageUrl`,`allergenes`,`maxAmountOfParticipants`,`price`,`cookId`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ',
-                        [newMeal.name,newMeal.description,newMeal.isActive,newMeal.isVega,newMeal.isVegan,newMeal.isToTakeHome,newMeal.dateTime,newMeal.imageUrl,callback,newMeal.maxAmountOfParticipants,newMeal.price,tempCookId],
+                        [newMeal.name,newMeal.description,newMeal.isActive,newMeal.isVega,newMeal.isVegan,newMeal.isToTakeHome,newMeal.dateTime,newMeal.imageUrl,callback,newMeal.maxAmountOfParticipants,newMeal.price,CookId],
                         (err, rows, fields) => {
                             connection.release()
                             if (err) {
@@ -142,13 +142,14 @@ let controller = {
 
     deleteMeal(req,res) {
         const mealId = req.params.mealId;
+        const userId = req.userIdFromToken;
         pool.getConnection((err, connection) => {
             if (err) {
             res.status(500).json({error: err.tostring()})
             }
             if (connection) {
                 connection.query(
-                    'SELECT `id` FROM `meal` WHERE `id` = ?',
+                    'SELECT `id`, `cookId` FROM `meal` WHERE `id` = ?',
                     [mealId],
                     (err, rows, fields) => {
                         connection.release()
@@ -159,6 +160,7 @@ let controller = {
                             console.log(rows)
                             res.status(409).json({message: "Meal bestaat niet"});
                         } else {
+                            if (rows[0].cookId == userId) {
                             pool.getConnection((err, connection) => {
                                 if (err) {
                                 res.status(500).json({error: err.tostring()})
@@ -179,6 +181,10 @@ let controller = {
                                     )
                                 }
                             })
+                            }
+                            else {
+                                res.status(403).json({message: "Gebruiker is niet de eigenaar"})
+                            }
                         }
                     }
                 )

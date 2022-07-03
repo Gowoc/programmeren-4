@@ -214,9 +214,49 @@ let controller = {
         })
     },
 
+    userProfile(req,res) {
+        const userId = req.userIdFromToken;
+        pool.getConnection((err, connection) => {
+            if (err) {
+            res.status(500).json({error: err.tostring()})
+            }
+            if (connection) {
+                connection.query(
+                    'SELECT * FROM `user` WHERE `id` = ?',
+                    [userId],
+                    (err, rows, fields) => {
+                        connection.release()
+                        if (err) {
+                            res.status(500).json({error: err.tostring()})
+                        }
+                        if (rows.length == 0) {
+                            res.status(404).json({error: "User bestaat niet"})
+                        } else if (rows.length > 0) {
+                            getUserMeals(userId, (error, result) => {
+                                if (error == "Geen meals") {
+                                    res.status(200).json(rows);
+                                } else if (error) {
+                                    res.status(500).json({error: error})
+                                }
+                                if (result) {
+                                    rows[0].meals = result
+                                    res.status(200).json(rows);
+                                }
+                            })
+                        } else {
+                            res.status(500).json({error: "Er is iets heel vreemd gegeaan"})
+                        }
+                    }
+                )
+            }
+        })
+    },
+
     editUser(req,res) {
         newUser = req.body;
         const userId = req.params.userId;
+        const loggedUserId = req.userIdFromToken;
+        if (userId == loggedUserId) {
 
         console.log(newUser);
         if (newUser.firstName == null || newUser.lastName == null || newUser.street == null || newUser.city == null || newUser.emailAdress == null || newUser.password == null) {
@@ -294,10 +334,14 @@ let controller = {
                 )
             }
         })
+        } else {res.status(403).json({message: "Gebruiker is niet de eigenaar"})}
     },
 
     deleteUser(req,res) {
         let userId = req.params.userId;
+        const loggedUserId = req.userIdFromToken;
+        if (userId == loggedUserId) {
+
         pool.getConnection((err, connection) => {
             if (err) {
             res.status(500).json({error: err.tostring()})
@@ -340,6 +384,7 @@ let controller = {
                 )
             }
         })
+        } else {res.status(403).json({message: "Gebruiker is niet de eigenaar"})}
     }
 };
 
