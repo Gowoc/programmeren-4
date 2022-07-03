@@ -47,7 +47,8 @@ let controller = {
         } else {
             pool.getConnection((err, connection) => {
                 if (err) {
-                res.status(500).json({error: err})
+                    console.log(err)
+                    res.status(500).json({error: err})
                 }
                 if (connection) {
                     connection.query(
@@ -56,12 +57,14 @@ let controller = {
                         (err, rows, fields) => {
                             connection.release()
                             if (err) {
+                                console.log(err)
                                 res.status(500).json({error: err})
                             }
                             else {
                                 pool.getConnection((err, connection) => {
                                     if (err) {
-                                    res.status(500).json({error: err})
+                                        console.log(err)
+                                        res.status(500).json({error: err})
                                     }
                                     if (connection) {
                                         connection.query(
@@ -70,13 +73,15 @@ let controller = {
                                             (err, rows, fields) => {
                                                 connection.release()
                                                 if (err) {
+                                                    console.log(err)
                                                     res.status(500).json({error: err})
                                                 }
                                                 if (rows.length > 0) {
                                                     console.log(rows[0]);
                                                     pool.getConnection((err, connection) => {
                                                         if (err) {
-                                                        res.status(500).json({error: err})
+                                                            console.log(err)
+                                                            res.status(500).json({error: err})
                                                         }
                                                         if (connection) {
                                                             connection.query(
@@ -85,11 +90,13 @@ let controller = {
                                                                 (err, rows, fields) => {
                                                                     connection.release()
                                                                     if (err) {
+                                                                        console.log(err)
                                                                         res.status(500).json({error: err})
                                                                     }
                                                                     if (rows.length > 0) {
                                                                         res.status(200).json(rows);
                                                                     } else {
+                                                                        console.log("Heel vreemd")
                                                                         res.status(500).json({error: "Er is iets heel vreemd gegeaan"})
                                                                     }
                                                                 }
