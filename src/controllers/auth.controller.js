@@ -14,11 +14,14 @@ let controller = {
         } else if (!emailAdress.includes("@") || !emailAdress.includes(".")) {
             console.log("Emailadres is fout");
             res.status(400).json({message: "Email Adress is ongeldig"});
+        } else if (password.length < 5) {
+            console.log("Password te kort");
+            res.status(400).json({message: "Wachtwoord is te kort"});
         } else {
 
         pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(

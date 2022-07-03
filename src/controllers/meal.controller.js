@@ -12,7 +12,7 @@ let controller = {
     allMeals(req,res) {
         pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -21,7 +21,7 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length == 0) {
                             res.status(404).json({error: "Er zijn geen meals"})
@@ -47,7 +47,7 @@ let controller = {
         } else {
             pool.getConnection((err, connection) => {
                 if (err) {
-                res.status(500).json({error: err.tostring()})
+                res.status(500).json({error: err})
                 }
                 if (connection) {
                     connection.query(
@@ -61,7 +61,7 @@ let controller = {
                             else {
                                 pool.getConnection((err, connection) => {
                                     if (err) {
-                                    res.status(500).json({error: err.tostring()})
+                                    res.status(500).json({error: err})
                                     }
                                     if (connection) {
                                         connection.query(
@@ -70,13 +70,13 @@ let controller = {
                                             (err, rows, fields) => {
                                                 connection.release()
                                                 if (err) {
-                                                    res.status(500).json({error: err.tostring()})
+                                                    res.status(500).json({error: err})
                                                 }
                                                 if (rows.length > 0) {
                                                     console.log(rows[0]);
                                                     pool.getConnection((err, connection) => {
                                                         if (err) {
-                                                        res.status(500).json({error: err.tostring()})
+                                                        res.status(500).json({error: err})
                                                         }
                                                         if (connection) {
                                                             connection.query(
@@ -116,7 +116,7 @@ let controller = {
         const mealId = req.params.mealId;
         pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -125,7 +125,7 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length == 0) {
                             res.status(404).json({error: "meal bestaat niet"})
@@ -145,7 +145,7 @@ let controller = {
         const userId = req.userIdFromToken;
         pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -154,16 +154,16 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length == 0) {
                             console.log(rows)
-                            res.status(409).json({message: "Meal bestaat niet"});
+                            res.status(404).json({message: "Meal bestaat niet"});
                         } else {
                             if (rows[0].cookId == userId) {
                             pool.getConnection((err, connection) => {
                                 if (err) {
-                                res.status(500).json({error: err.tostring()})
+                                res.status(500).json({error: err})
                                 }
                                 if (connection) {
                                     connection.query(
@@ -172,7 +172,7 @@ let controller = {
                                         (err, rows, fields) => {
                                             connection.release()
                                             if (err) {
-                                                res.status(500).json({error: err.tostring()})
+                                                res.status(500).json({error: err})
                                             }
                                             else {
                                                 res.status(200).json({message: "Meal verwijdert"})

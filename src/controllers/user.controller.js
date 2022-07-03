@@ -3,7 +3,7 @@ const pool = require("../database/dbconnection")
 function getUserMeals(userId, callback) {
     pool.getConnection((err, connection) => {
         if (err) {
-        res.status(500).json({error: err.tostring()})
+        res.status(500).json({error: err})
         }
         if (connection) {
             connection.query(
@@ -45,7 +45,7 @@ let controller = {
             let active = req.query.active;
             pool.getConnection((err, connection) => {
                 if (err) {
-                res.status(500).json({error: err.tostring()})
+                res.status(500).json({error: err})
                 }
                 if (connection) {
                     connection.query(
@@ -57,7 +57,7 @@ let controller = {
                                 res.status(500).json({error: err})
                             }
                             if (rows.length == 0) {
-                                res.status(404).json({error: "Geen users matchen de zoekopdracht"})
+                                res.status(200).json({error: "Geen users matchen de zoekopdracht"})
                             } else if (rows.length > 0) {
                                 res.status(200).json(rows)
                             } else {
@@ -71,7 +71,7 @@ let controller = {
         if (!req.query.active) {
             pool.getConnection((err, connection) => {
                 if (err) {
-                res.status(500).json({error: err.tostring()})
+                res.status(500).json({error: err})
                 }
                 if (connection) {
                     connection.query(
@@ -83,7 +83,7 @@ let controller = {
                                 res.status(500).json({error: err})
                             }
                             if (rows.length == 0) {
-                                res.status(404).json({error: "Geen users matchen de zoekopdracht"})
+                                res.status(200).json({error: "Geen users matchen de zoekopdracht"})
                             } else if (rows.length > 0) {
                                 res.status(200).json(rows)
                             } else {
@@ -113,7 +113,7 @@ let controller = {
             res.status(400).json({message: "Email Adress is fout"});
         } else pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -122,7 +122,7 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length > 0) {
                             console.log(rows)
@@ -130,7 +130,7 @@ let controller = {
                         } else {
                             pool.getConnection((err, connection) => {
                                 if (err) {
-                                res.status(500).json({error: err.tostring()})
+                                res.status(500).json({error: err})
                                 }
                                 if (connection) {
                                     connection.query(
@@ -139,12 +139,12 @@ let controller = {
                                         (err, rows, fields) => {
                                             connection.release()
                                             if (err) {
-                                                res.status(500).json({error: err.tostring()})
+                                                res.status(500).json({error: err})
                                             }
                                             else {
                                                 pool.getConnection((err, connection) => {
                                                     if (err) {
-                                                    res.status(500).json({error: err.tostring()})
+                                                    res.status(500).json({error: err})
                                                     }
                                                     if (connection) {
                                                         connection.query(
@@ -153,10 +153,10 @@ let controller = {
                                                             (err, rows, fields) => {
                                                                 connection.release()
                                                                 if (err) {
-                                                                    res.status(500).json({error: err.tostring()})
+                                                                    res.status(500).json({error: err})
                                                                 }
                                                                 if (rows.length > 0) {
-                                                                    res.status(200).json(rows)
+                                                                    res.status(201).json(rows)
                                                                 } else {
                                                                     res.status(500).json({error: "Er is iets heel vreemd gegeaan"})
                                                                 }
@@ -180,7 +180,7 @@ let controller = {
         const userId = req.params.userId;
         pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -189,7 +189,7 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length == 0) {
                             res.status(404).json({error: "User bestaat niet"})
@@ -218,7 +218,7 @@ let controller = {
         const userId = req.userIdFromToken;
         pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -227,7 +227,7 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length == 0) {
                             res.status(404).json({error: "User bestaat niet"})
@@ -256,7 +256,6 @@ let controller = {
         newUser = req.body;
         const userId = req.params.userId;
         const loggedUserId = req.userIdFromToken;
-        if (userId == loggedUserId) {
 
         console.log(newUser);
         if (newUser.firstName == null || newUser.lastName == null || newUser.street == null || newUser.city == null || newUser.emailAdress == null || newUser.password == null) {
@@ -273,7 +272,7 @@ let controller = {
             res.status(400).json({message: "Email Adress is fout"});
         } else pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -282,15 +281,16 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length == 0) {
                             console.log(rows)
-                            res.status(409).json({message: "Gebruiker bestaat niet"});
+                            res.status(400).json({message: "Gebruiker bestaat niet"});
                         } else {
+                            if (userId == loggedUserId) {
                             pool.getConnection((err, connection) => {
                                 if (err) {
-                                res.status(500).json({error: err.tostring()})
+                                res.status(500).json({error: err})
                                 }
                                 if (connection) {
                                     connection.query(
@@ -299,12 +299,12 @@ let controller = {
                                         (err, rows, fields) => {
                                             connection.release()
                                             if (err) {
-                                                res.status(500).json({error: err.tostring()})
+                                                res.status(500).json({error: err})
                                             }
                                             else {
                                                 pool.getConnection((err, connection) => {
                                                     if (err) {
-                                                    res.status(500).json({error: err.tostring()})
+                                                    res.status(500).json({error: err})
                                                     }
                                                     if (connection) {
                                                         connection.query(
@@ -313,7 +313,7 @@ let controller = {
                                                             (err, rows, fields) => {
                                                                 connection.release()
                                                                 if (err) {
-                                                                    res.status(500).json({error: err.tostring()})
+                                                                    res.status(500).json({error: err})
                                                                 }
                                                                 if (rows.length > 0) {
                                                                     res.status(200).json(rows)
@@ -329,22 +329,21 @@ let controller = {
                                     )
                                 }
                             })
+                            } else {res.status(403).json({message: "Gebruiker is niet de eigenaar"})}
                         }
                     }
                 )
             }
         })
-        } else {res.status(403).json({message: "Gebruiker is niet de eigenaar"})}
     },
 
     deleteUser(req,res) {
         let userId = req.params.userId;
         const loggedUserId = req.userIdFromToken;
-        if (userId == loggedUserId) {
 
         pool.getConnection((err, connection) => {
             if (err) {
-            res.status(500).json({error: err.tostring()})
+            res.status(500).json({error: err})
             }
             if (connection) {
                 connection.query(
@@ -353,15 +352,16 @@ let controller = {
                     (err, rows, fields) => {
                         connection.release()
                         if (err) {
-                            res.status(500).json({error: err.tostring()})
+                            res.status(500).json({error: err})
                         }
                         if (rows.length == 0) {
                             console.log(rows)
-                            res.status(409).json({message: "Gebruiker bestaat niet"});
+                            res.status(400).json({message: "Gebruiker bestaat niet"});
                         } else {
+                            if (userId == loggedUserId) {
                             pool.getConnection((err, connection) => {
                                 if (err) {
-                                res.status(500).json({error: err.tostring()})
+                                res.status(500).json({error: err})
                                 }
                                 if (connection) {
                                     connection.query(
@@ -370,7 +370,7 @@ let controller = {
                                         (err, rows, fields) => {
                                             connection.release()
                                             if (err) {
-                                                res.status(500).json({error: err.tostring()})
+                                                res.status(500).json({error: err})
                                             }
                                             else {
                                                 res.status(200).json({message: "Gebruiker verwijdert"})
@@ -379,12 +379,12 @@ let controller = {
                                     )
                                 }
                             })
+                            } else {res.status(403).json({message: "Gebruiker is niet de eigenaar"})}
                         }
                     }
                 )
             }
         })
-        } else {res.status(403).json({message: "Gebruiker is niet de eigenaar"})}
     }
 };
 
