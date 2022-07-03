@@ -256,8 +256,6 @@ let controller = {
         newUser = req.body;
         const userId = req.params.userId;
         const loggedUserId = req.userIdFromToken;
-
-        console.log(newUser);
         if (newUser.firstName == null || newUser.lastName == null || newUser.street == null || newUser.city == null || newUser.emailAdress == null || newUser.password == null) {
             res.status(400).json({message: "Verplicht veld ontbreekt"});
         } else if (req.body.password.length < 5) {
