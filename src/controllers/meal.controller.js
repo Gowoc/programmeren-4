@@ -1,35 +1,46 @@
 const pool = require("../database/dbconnection")
 
+function arrayForEach(array, callback) {
+    let returnString = ""
+    array.forEach(item => {
+        returnString += item += " ";
+    })
+    callback(returnString)
+}
+
 let controller = {
     allMeals(req,res) {
-        pool.getConnection(function(err,connection) {
-            if (err) throw err
-        
-            connection.query('SELECT * FROM meal;', (error, results, fields) => {
-                connection.release();
-                if (error) throw error;
-                
-
-                res.status(200).json({
-                    statusCode: 200,
-                    results: results
-                });
-              });
-        });
+        pool.getConnection((err, connection) => {
+            if (err) {
+            res.status(500).json({error: err.tostring()})
+            }
+            if (connection) {
+                connection.query(
+                    'SELECT * FROM `meal`',
+                    [],
+                    (err, rows, fields) => {
+                        connection.release()
+                        if (err) {
+                            res.status(500).json({error: err.tostring()})
+                        }
+                        if (rows.length == 0) {
+                            res.status(404).json({error: "Er zijn geen meals"})
+                        } else if (rows.length > 0) {
+                            res.status(200).json(rows)
+                        } else {
+                            res.status(500).json({error: "Er is iets heel vreemd gegeaan"})
+                        }
+                    }
+                )
+            }
+        })
 
     },
 
     newMeal(req,res) {
         let newMeal = req.body;
         let tempCookId = 1;
-        let allergenesArray = []
-        allergenesArray = newMeal.allergenes;
-        let allergenesString = ""
-        newMeal.allergenes.forEach(item => {
-            allergenesString += item += " " ;
-        })
-        console.log(allergenesString);
-
+        arrayForEach(newMeal.allergenes, (callback) => {
 
         if (newMeal.dateTime == null || newMeal.price == null || newMeal.imageUrl == null || newMeal.name == null || newMeal.description == null) {
             res.status(400).json({message: "Verplicht veld ontbreekt"});
@@ -41,7 +52,7 @@ let controller = {
                 if (connection) {
                     connection.query(
                         'INSERT INTO `meal` (`name`,`description`,`isActive`,`isVega`,`isVegan`,`isToTakeHome`,`dateTime`,`imageUrl`,`allergenes`,`maxAmountOfParticipants`,`price`,`cookId`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ',
-                        [newMeal.name,newMeal.description,newMeal.isActive,newMeal.isVega,newMeal.isVegan,newMeal.isToTakeHome,newMeal.dateTime,newMeal.imageUrl,allergenesString,newMeal.maxAmountOfParticipants,newMeal.price,tempCookId],
+                        [newMeal.name,newMeal.description,newMeal.isActive,newMeal.isVega,newMeal.isVegan,newMeal.isToTakeHome,newMeal.dateTime,newMeal.imageUrl,callback,newMeal.maxAmountOfParticipants,newMeal.price,tempCookId],
                         (err, rows, fields) => {
                             connection.release()
                             if (err) {
@@ -97,7 +108,8 @@ let controller = {
                     )
                 }
             })
-        } 
+        }
+    }) 
     },
 
     mealByID(req,res) {

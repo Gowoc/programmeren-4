@@ -1,39 +1,99 @@
 const pool = require("../database/dbconnection")
 
-function getAllUsers() {
-    let users
-    pool.getConnection(function(err,connection) {
-        if (err) throw err
-    
-        connection.query('SELECT * FROM user;', (error, results, fields) => {
-            connection.release();
-            if (error) throw error;
-            users = results;
-          });
-    });
-    return users;
+function getUserMeals(userId, callback) {
+    pool.getConnection((err, connection) => {
+        if (err) {
+        res.status(500).json({error: err.tostring()})
+        }
+        if (connection) {
+            connection.query(
+                'SELECT * FROM meal WHERE meal.id IN(SELECT mealId FROM meal_participants_user WHERE meal_participants_user.userId = ?)',
+                [userId],
+                (err, rows, fields) => {
+                    connection.release()
+                    if (err) {
+                        callback(err, undefined)
+                    }
+                    if (rows.length == 0) {
+                        const error = "Geen meals"
+                        callback(error, undefined)
+                    } else if (rows.length > 0) {
+                        callback(undefined, rows)
+                    } else {
+                        const error = "Zeer vreemde fout"
+                        callback(error, undefined)
+                    }
+                }
+            )
+        }
+    })
 }
-
 
 let controller = {
     allUsers(req,res) {
-        //console.log("alsjeblieft");
-        //res.status(200).json({users});
-
-        pool.getConnection(function(err,connection) {
-            if (err) throw err
-        
-            connection.query('SELECT * FROM user;', (error, results, fields) => {
-                connection.release();
-                if (error) throw error;
-                console.log('The solution is: ', results);
-
-                res.status(200).json({
-                    statusCode: 200,
-                    results: results
-                });
-              });
-        });
+        let limit = 999
+        let name = "%"
+        if (req.query.limit) {
+            limit = Number(req.query.limit)
+            
+        }
+        if (req.query.name) {
+            name = req.query.name
+            name +="%"
+        }
+        if (req.query.active) {
+            let active = req.query.active;
+            pool.getConnection((err, connection) => {
+                if (err) {
+                res.status(500).json({error: err.tostring()})
+                }
+                if (connection) {
+                    connection.query(
+                        'SELECT * FROM `user` WHERE user.firstName LIKE ? AND user.isActive = ? LIMIT ?',
+                        [name,active,limit],
+                        (err, rows, fields) => {
+                            connection.release()
+                            if (err) {
+                                res.status(500).json({error: err})
+                            }
+                            if (rows.length == 0) {
+                                res.status(404).json({error: "Geen users matchen de zoekopdracht"})
+                            } else if (rows.length > 0) {
+                                res.status(200).json(rows)
+                            } else {
+                                res.status(500).json({error: "Er is iets heel vreemd gegeaan"})
+                            }
+                        }
+                    )
+                }
+            })
+        } 
+        if (!req.query.active) {
+            pool.getConnection((err, connection) => {
+                if (err) {
+                res.status(500).json({error: err.tostring()})
+                }
+                if (connection) {
+                    connection.query(
+                        'SELECT * FROM `user` WHERE user.firstName LIKE ? LIMIT ?',
+                        [name,limit],
+                        (err, rows, fields) => {
+                            connection.release()
+                            if (err) {
+                                res.status(500).json({error: err})
+                            }
+                            if (rows.length == 0) {
+                                res.status(404).json({error: "Geen users matchen de zoekopdracht"})
+                            } else if (rows.length > 0) {
+                                res.status(200).json(rows)
+                            } else {
+                                res.status(500).json({error: "Er is iets heel vreemd gegeaan"})
+                            }
+                        }
+                    )
+                }
+            })
+        }
 
     },
 
@@ -134,7 +194,17 @@ let controller = {
                         if (rows.length == 0) {
                             res.status(404).json({error: "User bestaat niet"})
                         } else if (rows.length > 0) {
-                            res.status(200).json(rows)
+                            getUserMeals(userId, (error, result) => {
+                                if (error == "Geen meals") {
+                                    res.status(200).json(rows);
+                                } else if (error) {
+                                    res.status(500).json({error: error})
+                                }
+                                if (result) {
+                                    rows[0].meals = result
+                                    res.status(200).json(rows);
+                                }
+                            })
                         } else {
                             res.status(500).json({error: "Er is iets heel vreemd gegeaan"})
                         }
