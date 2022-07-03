@@ -117,7 +117,7 @@ describe('Meal API',() => {
             'authorization',
             'Bearer ' + jwt.sign({userId: 1}, process.env.JWT_SECRET)
         ).send({
-            "name": "allergenesmaaltijd",
+            "name": "testmeal",
             "description": "Dé pastaklassieker bij uitstek.",
             "isActive": true,
             "isVega": true,
@@ -125,11 +125,7 @@ describe('Meal API',() => {
             "isToTakeHome": true,
             "dateTime": "2022-06-30T11:41:08.879",
             "imageUrl": "https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg",
-            "allergenes": [
-              "gluten",
-              "noten",
-              "lactose"
-            ],
+            "allergenes": [],
             "maxAmountOfParticipants": 6,
             "price": 6.75
           })
